@@ -1,0 +1,530 @@
+package com.example.test;
+
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import android.os.StrictMode;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.InputStream;
+import android.annotation.SuppressLint;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+@SuppressLint("NewApi")
+public class MainActivity extends ActionBarActivity implements Button.OnClickListener{
+	//public final static String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+	private Button forget;
+	private Button register;
+	private Button Loggin;
+	private String firstname;
+	private String lastname;
+	private String gender;
+	private String id;
+	private static final String DEBUG_TAG = "HttpExample";
+	private static final String emaillogin ="user@";
+	private static final String passlogin = "password";
+	public  Map<String,List<String>> header;
+	private String cookietoken;
+	public String loginUsername;
+	private String loginPass;
+	private TextView textView;
+	
+	EditText connectUsername;
+	EditText connectPass;
+	@SuppressLint("NewApi")
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		Log.v("309", "-----------start at here-----------");
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+        if( getIntent().getBooleanExtra("Exit me", false)){
+            finish();
+            return; // add this to prevent from doing unnecessary stuffs
+        }
+		connectUsername = (EditText) findViewById(R.id.maineditText_username);
+		
+		connectPass = (EditText) findViewById(R.id.maineditText_password);
+		forget =(Button)findViewById(R.id.mainbutton_forget);
+		forget.setOnClickListener(this);
+		register = (Button)findViewById(R.id.mainbutton_register);
+		register.setOnClickListener(this);
+		Loggin =(Button)findViewById(R.id.mainbutton_login);
+		Loggin.setOnClickListener(this);
+		if(savedInstanceState ==null){
+			loginUsername="ywq@gmail.com";
+			loginPass="password1";
+			connectUsername.setText(loginUsername);
+			connectPass.setText(loginPass);
+			
+		}
+		else{
+			loginUsername = savedInstanceState.getString(emaillogin);
+			loginPass = savedInstanceState.getString(passlogin);
+            
+		}
+        
+		
+		connectUsername.addTextChangedListener(connectUsernameListener);
+		connectPass.addTextChangedListener(connectPassListener);
+	}
+	
+	private TextWatcher connectUsernameListener= new TextWatcher(){
+    
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count,
+                                  int after) {
+    // TODO Auto-generated method stub
+    
+    }
+    
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before,
+                              int count) {
+    // TODO Auto-generated method stub
+    
+    }
+    
+    @Override
+    public void afterTextChanged(Editable s) {
+    // TODO Auto-generated method stub
+    try{
+    loginUsername = s.toString();
+}
+catch(Exception e){
+
+}
+
+}
+
+};
+private TextWatcher connectPassListener = new TextWatcher(){
+
+@Override
+public void beforeTextChanged(CharSequence s, int start, int count,
+int after) {
+// TODO Auto-generated method stub
+
+}
+
+@Override
+public void onTextChanged(CharSequence s, int start, int before,
+int count) {
+// TODO Auto-generated method stub
+
+}
+
+@Override
+public void afterTextChanged(Editable s) {
+// TODO Auto-generated method stub
+try{
+loginPass = s.toString();
+}
+catch(Exception e){
+
+}
+
+}
+
+};
+protected void onSaveInstancestate(Bundle outstate){
+super.onSaveInstanceState(outstate);
+outstate.getString(emaillogin);
+outstate.getString(passlogin);
+}
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+// Inflate the menu; this adds items to the action bar if it is present.
+getMenuInflater().inflate(R.menu.main, menu);
+
+return true;
+}
+
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+// Handle action bar item clicks here. The action bar will
+// automatically handle clicks on the Home/Up button, so long
+// as you specify a parent activity in AndroidManifest.xml.
+int id = item.getItemId();
+if (id == R.id.friendlistcheckBox1) {
+return true;
+}
+return super.onOptionsItemSelected(item);
+}
+@Override
+public void onClick(View view){
+if(view==forget){
+Intent intent = new Intent(this, Forgetpassword.class);
+startActivity(intent);
+}
+else if(view == register){
+Intent intent = new Intent(this, Register.class);
+startActivity(intent);
+}
+else if(view ==Loggin){
+boolean usernamesafe = true;
+boolean passwordsafe = true;
+char[] ary = {'!','#','$','%','^','&','*','(',')','[',']','{','}','=','+','-','_'};
+for(int i=0;i<ary.length;i++){
+if(loginUsername.contains(""+ary[i])){
+usernamesafe = false;
+}
+if(loginPass.contains(""+ary[i])){
+passwordsafe = false;
+}
+}
+
+if(!loginUsername.contains("@")){
+Toast.makeText(this, "your username should be an E-mail address", Toast.LENGTH_LONG).show();
+}
+else if((!usernamesafe)||(!passwordsafe)){
+Toast.makeText(this, "special character is not allowed", Toast.LENGTH_LONG).show();
+}
+else if(loginPass.isEmpty()||loginUsername.isEmpty()){
+Toast.makeText(this, "Please enter your emailaddress or password", Toast.LENGTH_LONG).show();
+}
+else{
+//myClickHandler(view);
+try {
+
+switch( sendrequest(loginUsername,loginPass)){
+case 0:Toast.makeText(this, "Login Success", Toast.LENGTH_LONG).show();
+Intent intent = new Intent(this, MainPageActicity.class);
+intent.putExtra("username", loginUsername);
+intent.putExtra("firstname", firstname);
+intent.putExtra("lastname", lastname);
+intent.putExtra("gender", gender);
+intent.putExtra("id", id);
+intent.putExtra("header", cookietoken);
+//				     	intent.putExtra("header", header);
+
+
+startActivity(intent);
+break;
+case 1:Toast.makeText(this, "Email input illegal", Toast.LENGTH_LONG).show();
+break;
+case 2:Toast.makeText(this, "Email do not exist", Toast.LENGTH_LONG).show();
+break;
+case 3:Toast.makeText(this, "password illegal", Toast.LENGTH_LONG).show();
+break;
+case 4:Toast.makeText(this, "password not match", Toast.LENGTH_LONG).show();
+break;
+default:Toast.makeText(this, "Two argument needed", Toast.LENGTH_LONG).show();
+}
+//					postEvents();
+} catch (IOException e) {
+// TODO Auto-generated catch block
+e.printStackTrace();
+}
+
+
+
+Log.v("loggin", "end function");
+
+//			try {
+//				downloadUrl(loginurl);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+}
+}
+}
+//	public void loginconnection(String name, String pass, String url)
+//
+//	        throws ClassNotFoundException, SQLException, java.sql.SQLException {
+//
+//	    Class.forName("com.mysql.jdbc.Driver");
+//
+//	    Connection conn = DriverManager.getConnection(url, name, pass);
+//	    conn.getClientInfo();
+//	    Log.v("coonect", ""+ conn.getClientInfo());
+//
+//	}
+public void myClickHandler(View view) {
+// Gets the URL from the UI's text field.
+// String stringUrl = urlText.getText().toString();
+ConnectivityManager connMgr = (ConnectivityManager)
+getSystemService(Context.CONNECTIVITY_SERVICE);
+NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+if (networkInfo != null && networkInfo.isConnected()) {
+new DownloadWebpageTask().execute("http://104.131.19.115/rainbox/frontendAPI/userAuth/signup.php");
+Log.v("-----------", "***************");
+} else {
+textView.setText("No network connection available.");
+}
+}
+
+// Uses AsyncTask to create a task away from the main UI thread. This task takes a
+// URL string and uses it to create an HttpUrlConnection. Once the connection
+// has been established, the AsyncTask downloads the contents of the webpage as
+// an InputStream. Finally, the InputStream is converted into a string, which is
+// displayed in the UI by the AsyncTask's onPostExecute method.
+private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+    @Override
+    protected String doInBackground(String... urls) {
+        
+        // params comes from the execute() call: params[0] is the url.
+        try {
+            return downloadUrl(urls[0]);
+            
+        } catch (IOException e) {
+            return "Unable to retrieve web page. URL may be invalid.";
+        }
+    }
+    // onPostExecute displays the results of the AsyncTask.
+    //  @Override
+    //	        protected void onPostExecute(String result) {
+    //	            textView.setText(result);
+    //	       }
+}
+// Given a URL, establishes an HttpUrlConnection and retrieves
+// the web page content as a InputStream, which it returns as
+// a string.
+private String downloadUrl(String myurl) throws IOException {
+InputStream is = null;
+// Only display the first 500 characters of the retrieved
+// web page content.
+int len = 500;
+
+try {
+
+URL url = new URL(myurl);
+HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+conn.setReadTimeout(10000 /* milliseconds */);
+conn.setConnectTimeout(15000 /* milliseconds */);
+conn.setRequestMethod("GET");
+//       conn.setr
+conn.setDoOutput(true);
+conn.setDoInput(true);
+// Starts the query
+List<NameValuePair> params = new ArrayList<NameValuePair>();
+params.add(new BasicNameValuePair("firstParam", "email"));
+params.add(new BasicNameValuePair("secondParam", "password"));
+
+OutputStream os = conn.getOutputStream();
+BufferedWriter writer = new BufferedWriter(
+new OutputStreamWriter(os, "UTF-8"));
+writer.write(getQuery(params));
+writer.flush();
+writer.close();
+os.close();
+//            HttpPost();
+
+
+
+
+conn.connect();
+int response = conn.getResponseCode();
+Log.d(DEBUG_TAG, "The response is: " + response);
+is = conn.getInputStream();
+
+// Convert the InputStream into a string
+String contentAsString = readIt(is, len);
+Log.v("connect", contentAsString);
+return contentAsString;
+
+// Makes sure that the InputStream is closed after the app is
+// finished using it.
+} finally {
+if (is != null) {
+is.close();
+}
+}
+}
+public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+Reader reader = null;
+reader = new InputStreamReader(stream, "UTF-8");
+Log.e("read", reader.toString());
+
+char[] buffer = new char[len];
+reader.read(buffer);
+//	    Log.e("read", reader.read(buffer)+"");
+return new String(buffer);
+}
+
+private String getQuery(List<NameValuePair> params) throws UnsupportedEncodingException
+{
+StringBuilder result = new StringBuilder();
+boolean first = true;
+
+for (NameValuePair pair : params)
+{
+if (first)
+first = false;
+else
+result.append("&");
+
+result.append(URLEncoder.encode(pair.getName(), "UTF-8"));
+result.append("=");
+result.append(URLEncoder.encode(pair.getValue(), "UTF-8"));
+}
+Log.v("outputstream", result.toString());
+return result.toString();
+}
+private int sendrequest(String username, String password) throws IOException{
+InputStream result = null;
+URL request = new URL("http://104.131.19.115/rainbox/frontendAPI/userAuth/signin.php");
+Log.v("send", "start");
+Map<String,Object> params = new LinkedHashMap<>();
+params.put("email", username);
+// params.put("reply_to_thread", 10394);
+params.put("password", password);
+StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+StrictMode.setThreadPolicy(policy);
+StringBuilder postData = new StringBuilder();
+for (Map.Entry<String,Object> param : params.entrySet()) {
+if (postData.length() != 0) postData.append('&');
+postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+postData.append('=');
+postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+}
+byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+//     (HttpURLConnection)reques
+HttpURLConnection conn = (HttpURLConnection)request.openConnection();
+
+conn.setRequestMethod("POST");
+conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+conn.setDoOutput(true);
+
+conn.getOutputStream().write(postDataBytes);
+result = conn.getInputStream();
+//     result.
+header =  conn.getHeaderFields();
+//     try{
+//    	 checkheader(header);
+//    	 }
+//     catch(Exception e){
+//
+//     }
+checkheader(header);
+Log.e("connect1",header.toString());
+//     String encoding = conn.getContentEncoding();
+//     encoding = encoding == null ? "UTF-8" : encoding;
+//     String body =encoding.toString();
+//     String body = IOUtils.toString(result, encoding);
+String temp = readIt(result,300);
+Log.v("connect1",temp);
+//   checksconnectstatus(temp);
+//     Reader in = new Bu÷feredReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+//     for (int c; (c = in.read()) >= 0; System.out.print((char)c));
+
+
+// Toast.makeText(this, "Your post was successfully uploaded", Toast.LENGTH_LONG).show();
+Log.v("send", "end");
+return checksconnectstatus(temp);
+}
+
+private int checksconnectstatus(String str){
+//int length = str.length();
+
+// str.trim();
+Log.e("check", str);
+String temp = "retFlag";
+String firstnametext = "firstName";
+String lastnametext = "lastName";
+String gendertext = "gender";
+String idtext = "id";
+String endtext = "}";
+int endnum=str.indexOf(endtext);
+int fistnamenum = str.indexOf(firstnametext);
+int lastnamenum = str.indexOf(lastnametext);
+int gendernum = str.indexOf(gendertext);
+int idnum = str.indexOf(idtext);
+int i = str.indexOf(temp);
+int retflag=100;
+if(str.contains(temp)){
+retflag = Integer.valueOf(str.charAt(i+9)+"");
+Log.v("check", "retflag:"+retflag+"  firstname:"+" "+str.substring(fistnamenum+firstnametext.length()+3, lastnamenum-3)+"   lastname:"+str.substring(lastnamenum+lastnametext.length()+3, gendernum-3)+"   Gender:"+str.substring(gendernum+gendertext.length()+3, idnum-3)+"   ID:"+str.substring(idnum+5,endnum-1));
+firstname=str.substring(fistnamenum+firstnametext.length()+3, lastnamenum-3);
+lastname=str.substring(lastnamenum+lastnametext.length()+3, gendernum-3);
+gender=str.substring(gendernum+gendertext.length()+3, idnum-3);
+id=str.charAt(idnum+5)+"";
+}
+else{
+Log.v("check", "didnt find retflag");
+}
+//char[] temp = {'c','s'};
+
+return retflag;
+}
+
+
+private int checkheader(Map<String,List<String>> temp){
+boolean cookieflag = false;
+Log.v("check string", "start"+temp.toString());
+//	 temp.keySet().toString();
+//	 temp.k
+String token = "token=";
+String expires ="expires";
+String tempstr = temp.get("Set-Cookie").toString();
+if(temp.containsKey("Set-Cookie")){
+cookietoken = tempstr.substring(tempstr.indexOf(token)+token.length(),tempstr.indexOf(expires)-2);
+Log.v("check string", cookietoken);
+cookieflag =true;
+}
+else {
+Log.e("check string", "no cookie");
+}
+
+Log.v("first loop:",  temp.keySet().toString());
+if(cookieflag) Log.v("second loop", cookietoken);
+
+return 0;
+}
+
+public String readentity(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+Reader reader = null;
+reader = new InputStreamReader(stream, "UTF-8");
+Log.e("read", reader.toString());
+
+char[] buffer = new char[len];
+reader.read(buffer);
+//	    Log.e("read", reader.read(buffer)+"");
+return new String(buffer);
+}
+
+
+}

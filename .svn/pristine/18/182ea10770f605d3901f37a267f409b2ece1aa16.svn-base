@@ -1,0 +1,396 @@
+package com.example.test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Toast;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
+
+@SuppressLint("NewApi")
+public class Register extends ActionBarActivity implements OnClickListener {
+	private Button register;
+	private String firstname="";
+	private String lastname="";
+	private String e_mail="";
+	private String gender="";
+	private String password="";
+	private String confirmpassword="";
+	private String signature="";
+	private CheckBox malebox;
+	private CheckBox femalebox;
+	private EditText firstnameTD;
+	private EditText lastnameTD;
+	private EditText e_mailTD;
+	private EditText passwordTD;
+	private EditText confirmpasswordTD;
+	private EditText signatureTD;
+	private String signupurl = "http://104.131.19.115/rainbox/frontendAPI/userAuth/signup.php";
+	private boolean male=true;
+	private boolean female=true;
+	private RadioGroup gendergroup;
+	private RadioButton malegender;
+	private RadioButton femalegender;
+	
+	//private Button reg_register;
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_register);
+		gendergroup = (RadioGroup) findViewById(R.id.ragester_radioGroup);
+		malegender = (RadioButton)findViewById(R.id.register_male_RadioButton);
+		femalegender = (RadioButton)findViewById(R.id.register_female_RadioButton);
+		firstnameTD= (EditText) findViewById(R.id.personaleditText_email);
+		lastnameTD = (EditText) findViewById(R.id.registereditText_lastname);
+		e_mailTD = (EditText) findViewById(R.id.registereditText_email);
+		passwordTD = (EditText) findViewById(R.id.registereditText_password);
+		confirmpasswordTD = (EditText) findViewById(R.id.registereditText_confirm);
+		signatureTD = (EditText) findViewById(R.id.registereditText_signature);
+		register = (Button)findViewById(R.id.registerbutton_register);
+		register.setOnClickListener(this);
+		firstnameTD.addTextChangedListener(firstnameTDlistener);
+		lastnameTD.addTextChangedListener(lastnameTDlistener);
+		e_mailTD.addTextChangedListener(e_mailTDlistener);
+		passwordTD.addTextChangedListener(passwordTDlistener);
+		confirmpasswordTD.addTextChangedListener(confirmpasswordTDlistener);
+		signatureTD.addTextChangedListener(signatureTDlistener);
+		setupradiolistener();
+	}
+	private void setupradiolistener(){
+		gendergroup.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				male= malegender.isChecked();
+				 if(male)Log.e("gender","male");
+				female = femalegender.isChecked();
+				if(female)Log.e("connect1","female");
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				// TODO Auto-generated method stub
+				Log.e("gender","gender check");
+				 if (checkedId == R.id.register_male_RadioButton) {
+					 Log.e("gender","male gender check");
+					 male =true;
+					 female = false;
+                     //some code
+                 } else if (checkedId == R.id.register_female_RadioButton) {
+                	 Log.e("gender","female gender check");
+                	 female = true;
+                	 male = false;
+                     //some code
+                 }
+			}
+			
+		});
+	
+	}
+	private TextWatcher firstnameTDlistener= new TextWatcher(){
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			// TODO Auto-generated method stub
+			firstname = s.toString();
+			
+		}};
+	
+	private TextWatcher lastnameTDlistener= new TextWatcher(){
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			// TODO Auto-generated method stub
+			lastname = s.toString();
+		}};
+
+	private TextWatcher e_mailTDlistener= new TextWatcher(){
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			// TODO Auto-generated method stub
+			e_mail = s.toString();
+		}};
+
+	private TextWatcher passwordTDlistener= new TextWatcher(){
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			// TODO Auto-generated method stub
+			password=s.toString();
+		}};
+
+	private TextWatcher confirmpasswordTDlistener= new TextWatcher(){
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			// TODO Auto-generated method stub
+			confirmpassword=s.toString();
+		}};
+
+	private TextWatcher signatureTDlistener= new TextWatcher(){
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,
+				int after) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,
+				int count) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void afterTextChanged(Editable s) {
+			// TODO Auto-generated method stub
+			signature=s.toString();
+		}};
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.register, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.friendlistcheckBox1) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	@SuppressLint("NewApi")
+	public void onClick(View view){
+		 if(view == register){
+//			Intent intent = new Intent(this, Register.class);
+//			startActivity(intent);
+			 Log.v("register", "on click");
+			boolean result=true;
+			 if( male){gender="M";}
+			 else{gender = "F";}
+			 Log.v("register", "gender checked");
+			 if(firstname.isEmpty()||lastname.isEmpty()||e_mail.isEmpty()||gender.isEmpty()||password.isEmpty()){
+				 Toast.makeText(this, "All the text should be filled", Toast.LENGTH_LONG).show();
+				 result=false;
+				 Log.v("register", "empty checked");
+			 }
+			 if(!password.equals(confirmpassword)){
+				 Toast.makeText(this, "your password should same as confirm password", Toast.LENGTH_LONG).show();
+				 result=false;
+				 Log.v("register", "password checked");
+			 }
+			 if(!e_mail.contains("@")){
+				 Toast.makeText(this, "Please enter your emailaddress", Toast.LENGTH_LONG).show();
+				 result=false;
+				 Log.v("register", "email checked");
+			 }
+			 
+			 if(result==true){Log.v("register",firstname+" "+ lastname+" "+e_mail+" "+gender+" "+password+" "+confirmpassword+" "+signature);
+			 try {
+				
+				 switch( sendrequest(e_mail,password,signupurl,gender,firstname,lastname)){
+			     case 0:Toast.makeText(this, "sign up Success", Toast.LENGTH_LONG).show();
+			     		break;
+			     case 1:Toast.makeText(this, "Email input illegal", Toast.LENGTH_LONG).show();
+			    	 break;
+			     case 2:Toast.makeText(this, "Email already exist", Toast.LENGTH_LONG).show();
+			    	 break;
+			     case 3:Toast.makeText(this, "password input illegal", Toast.LENGTH_LONG).show(); 
+			    	 break;
+			     case 4:Toast.makeText(this, "Password complexity Check failed", Toast.LENGTH_LONG).show(); 
+			    	 break;
+			     case 5:Toast.makeText(this, "name format illegal", Toast.LENGTH_LONG).show(); 
+		    	 break; 
+			     case 6:Toast.makeText(this, "Gender format Illegal", Toast.LENGTH_LONG).show(); 
+		    	 break;
+			     default:Toast.makeText(this, "Arguments mssing needed (email and password)", Toast.LENGTH_LONG).show();
+			     }
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 }
+		 }
+	}
+	 public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+		    Reader reader = null;
+		    reader = new InputStreamReader(stream, "UTF-8"); 
+		    Log.e("read", reader.toString());
+		    
+		    char[] buffer = new char[len];
+		    reader.read(buffer);
+//		    Log.e("read", reader.read(buffer)+"");
+		    return new String(buffer);
+		}
+	 private int sendrequest(String username, String password,String url, String gender, String firstname, String lastname) throws IOException{
+		 InputStream result = null;
+		 URL request = new URL(url);
+		 Log.v("send", "start");
+	     Map<String,Object> params = new LinkedHashMap<>();
+	     params.put("email", username);
+	    // params.put("reply_to_thread", 10394);
+	     params.put("password", password);
+	     params.put("firstName", firstname);
+	     params.put("lastName", lastname);
+	     params.put("gender", gender);
+	     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+	     StrictMode.setThreadPolicy(policy);
+	     StringBuilder postData = new StringBuilder();
+	     for (Map.Entry<String,Object> param : params.entrySet()) {
+	         if (postData.length() != 0) postData.append('&');
+	         postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+	         postData.append('=');
+	         postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+	     }
+	     byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+	     HttpURLConnection conn = (HttpURLConnection)request.openConnection();
+	     conn.setRequestMethod("POST");
+	     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+	     conn.setRequestProperty("Content-Length", String.valueOf(postDataBytes.length));
+	     conn.setDoOutput(true);
+	     conn.getOutputStream().write(postDataBytes);
+	     result = conn.getInputStream();
+	     
+	     Log.e("connect1",result.toString());
+//	     String encoding = conn.getContentEncoding();
+//	     encoding = encoding == null ? "UTF-8" : encoding;
+//	     String body =encoding.toString();
+//	     String body = IOUtils.toString(result, encoding);
+	     String temp = readIt(result,300);
+	     Log.v("connect1",temp);
+	  //   checksconnectstatus(temp);
+//	     Reader in = new Bu÷feredReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+//	     for (int c; (c = in.read()) >= 0; System.out.print((char)c));
+
+	     
+	    // Toast.makeText(this, "Your post was successfully uploaded", Toast.LENGTH_LONG).show();
+	     Log.v("send", "end");
+	     return checksconnectstatus(temp);
+	 }
+
+	 private int checksconnectstatus(String str){
+		 //int length = str.length();
+		 
+		// str.trim();
+		 Log.e("check", str);
+		 String temp = "retFlag";
+		 int i = str.indexOf(temp);
+		 int retflag=100;
+		 if(str.contains(temp)){
+			retflag = Integer.valueOf(str.charAt(i+9)+"");
+			Log.v("check", "retflag:"+retflag);
+		//	id=str.charAt(idnum+5)+"";
+		 }
+		 else{
+			 Log.v("check", "didnt find retflag");
+		 }
+		//char[] temp = {'c','s'};
+		 
+		 return retflag;
+	 }
+}

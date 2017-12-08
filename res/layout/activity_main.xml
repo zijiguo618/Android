@@ -1,0 +1,87 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@drawable/beijing3"
+    tools:context="com.example.coms309_ui.Login" >
+
+    <EditText
+        android:id="@+id/maineditText_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:ems="5"
+        android:inputType="textPassword"
+        android:text="@string/main_editText_password" />
+
+    <TextView
+        android:id="@+id/maintextView_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/maineditText_password"
+        android:layout_centerHorizontal="true"
+        android:text="@string/main_textView_Password" />
+
+    <EditText
+        android:id="@+id/maineditText_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/maintextView_password"
+        android:layout_alignRight="@+id/maineditText_password"
+        android:layout_marginBottom="14dp"
+        android:ems="5"
+        android:text="@string/main_editText_username" />
+
+    <TextView
+        android:id="@+id/maintextView_Tittle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="28dp"
+        android:text="@string/main_textView_Tittle" />
+
+    <Button
+        android:id="@+id/mainbutton_register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/mainbutton_forget"
+        android:layout_alignBottom="@+id/mainbutton_forget"
+        android:layout_toRightOf="@+id/maintextView_Username"
+        android:text="@string/main_button_register" />
+
+    <TextView
+        android:id="@+id/maintextView_Username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/maineditText_username"
+        android:layout_alignLeft="@+id/maintextView_password"
+        android:text="@string/main_textView_Username"
+        android:textColor="@color/right" />
+
+    <Button
+        android:id="@+id/mainbutton_login"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/maineditText_password"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="22dp"
+        android:text="@string/main_button_login" />
+
+    <Button
+        android:id="@+id/mainbutton_forget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mainbutton_login"
+        android:layout_marginTop="28dp"
+        android:layout_toLeftOf="@+id/mainbutton_login"
+        android:onClick="intoforgetpage"
+        android:text="@string/main_button_forget" />
+
+</RelativeLayout>

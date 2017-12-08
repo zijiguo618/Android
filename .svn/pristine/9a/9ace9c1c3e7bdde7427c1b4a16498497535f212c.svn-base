@@ -1,0 +1,495 @@
+package com.example.test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.annotation.SuppressLint;
+import android.app.ListActivity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+@SuppressLint("NewApi")
+public class Personal extends ListActivity {
+    
+	private CheckBox share;
+	private Button logout;
+	private Button mediaplayer;
+	private ImageButton touxiang;
+	private EditText nameET;
+	private EditText e_mailET;
+	private EditText passwordET;
+	private TextView streamtext;
+	private String name;
+	private String e_mail;
+	private String password;
+	private LayoutInflater inflater;
+	private String username = "";
+	private String cookietoken="";
+	private String firstname = "";
+	private String lastname = "";
+	private String gender = "";
+	private String id = "";
+	private String url = "http://104.131.19.115/rainbox/frontendAPI/userAuth/signout.php";
+	private String getstream = "http://104.131.19.115/rainbox/frontendAPI/streamAPI/getCurrentStream.php";
+	ArrayList<HashMap<String, Object>> statuses;
+    
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		Log.v("personal", "get into persoonal page");
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_personal);
+		Intent myintent = getIntent();
+		username = myintent.getStringExtra("username");
+		firstname = myintent.getStringExtra("firstname");
+		lastname = myintent.getStringExtra("lastname");
+		gender = myintent.getStringExtra("gender");
+		id = myintent.getStringExtra("id");
+		cookietoken = myintent.getStringExtra("header");
+		nameET = (EditText) findViewById(R.id.personaleditText_name);
+		e_mailET = (EditText) findViewById(R.id.personaleditText_email);
+		e_mailET.addTextChangedListener(e_mailTDlistener);
+		//passwordET = (EditText) findViewById(R.id.personaleditText_password);
+		mediaplayer = (Button) findViewById(R.id.person_media_button);
+		mediaplayer.setOnClickListener(new OnClickListener(){
+            
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intent = new Intent(getApplicationContext(),MusicPlayer.class);
+                startActivity(intent);
+			}
+			
+		});
+		touxiang  = (ImageButton) findViewById(R.id.personal_imageButton);
+		touxiang.setImageResource(R.drawable.touxiang);
+		touxiang.setOnClickListener(new OnClickListener(){
+            
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+                Intent intent = new Intent(getApplicationContext(),Loadpicture.class);
+                startActivity(intent);
+                
+			}
+			
+		});
+		nameET.addTextChangedListener(nameETlistener);
+		streamtext = (TextView)findViewById(R.id.personal_streamget_textview);
+		try {
+			streamtext.setText(getstreamuser(getstream,id));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		//passwordET.addTextChangedListener(passwordETlistener);
+		logout = (Button) findViewById(R.id.personal_logout_button);
+        
+		Log.v("personal", "EditText set up finished");
+		inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		Log.v("personal", "inflater set up finished");
+        
+		if (savedInstanceState == null) {
+			nameET.setText(lastname + " " + firstname);
+			e_mailET.setText(username);
+            
+		} else {
+            
+		}
+        
+		String[] status = { "Monday", "Tuesday", "Wednsday", "Thursday",
+            "Friday", "Saturday", "Monday","laoyu","shaboyi" };
+		Integer[] photos = { R.drawable.beijing, R.drawable.beijing2,
+            R.drawable.beijing, R.drawable.beijing2, R.drawable.beijing,
+            R.drawable.beijing2, R.drawable.beijing,
+            R.drawable.beijing2, R.drawable.beijing };
+		statuses = new ArrayList<HashMap<String, Object>>();
+		HashMap<String, Object> temp;
+		Log.v("personal", "finished set up , btw  Cookie:"+cookietoken);
+		// total number of rows in the ListView
+		int noOfPlayers = 9;
+		for (int i = 0; i < noOfPlayers; i++) {
+			temp = new HashMap<String, Object>();
+            
+			temp.put("name", status[i]);
+			temp.put("photo", photos[i]);
+			Log.v("user" + i, status[i]);
+			// add the row to the ArrayList
+			statuses.add(temp);
+		}
+		final CustomAdapter adapter = new CustomAdapter(this,
+                                                        R.layout.stastus_list, statuses);
+        
+		// finally,set the adapter to the default ListView
+		setListAdapter(adapter);
+		Log.v("personal", "list view finished");
+		logout.setOnClickListener(new OnClickListener() {
+            
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				try {
+                    switch( sendrequest(url)){
+                        case 0:
+                        case 1:
+                            Toast.makeText(getApplicationContext(), "signout Success", Toast.LENGTH_LONG).show();
+                            final Intent intent = new Intent(getApplicationContext(),MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            intent.putExtra("Exit me", true);
+                            startActivity(intent);
+                            finish();
+				     		break;
+                        default:Toast.makeText(getApplicationContext(), "User is not currently login (No Cookie exist)", Toast.LENGTH_LONG).show();
+						    
+                    }
+				}catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+            
+		});
+	}
+    
+	private TextWatcher e_mailTDlistener = new TextWatcher() {
+    
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count,
+                                  int after) {
+    // TODO Auto-generated method stub
+    
+    }
+    
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before,
+                              int count) {
+    // TODO Auto-generated method stub
+    
+    }
+    
+    @Override
+    public void afterTextChanged(Editable s) {
+    // TODO Auto-generated method stub
+    e_mail = s.toString();
+    
+}
+};
+private TextWatcher nameETlistener = new TextWatcher() {
+
+@Override
+public void beforeTextChanged(CharSequence s, int start, int count,
+int after) {
+// TODO Auto-generated method stub
+
+}
+
+@Override
+public void onTextChanged(CharSequence s, int start, int before,
+int count) {
+// TODO Auto-generated method stub
+
+}
+
+@Override
+public void afterTextChanged(Editable s) {
+// TODO Auto-generated method stub
+name = s.toString();
+
+}
+};
+private TextWatcher passwordETlistener = new TextWatcher() {
+
+@Override
+public void beforeTextChanged(CharSequence s, int start, int count,
+int after) {
+// TODO Auto-generated method stub
+
+}
+
+@Override
+public void onTextChanged(CharSequence s, int start, int before,
+int count) {
+// TODO Auto-generated method stub
+
+}
+
+@Override
+public void afterTextChanged(Editable s) {
+// TODO Auto-generated method stub
+password = s.toString();
+
+}
+};
+
+// define your custom adapter
+private class CustomAdapter extends ArrayAdapter<HashMap<String, Object>> {
+    // boolean array for storing
+    // the state of each CheckBox
+    boolean[] checkBoxState;
+    
+    ViewHolder viewHolder;
+    
+    public CustomAdapter(Context context, int textViewResourceId,
+                         ArrayList<HashMap<String, Object>> statuses) {
+        
+        // let android do the initializing :)
+        super(context, textViewResourceId, statuses);
+        
+        // create the boolean array with
+        // initial state as false
+        checkBoxState = new boolean[statuses.size()];
+    }
+    
+    // class for caching the views in a row
+    private class ViewHolder {
+        ImageView photo;
+        TextView name, team;
+        CheckBox checkBox;
+    }
+    
+    @Override
+    public View getView(final int position, View convertView,
+                        ViewGroup parent) {
+        
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.stastus_list, null);
+            viewHolder = new ViewHolder();
+            
+            // cache the views
+            viewHolder.photo = (ImageView) convertView
+            .findViewById(R.id.photo);
+            viewHolder.name = (TextView) convertView
+            .findViewById(R.id.name);
+            viewHolder.team = (TextView) convertView
+            .findViewById(R.id.team);
+            viewHolder.checkBox = (CheckBox) convertView
+            .findViewById(R.id.checkBox);
+            
+            // link the cached views to the convertview
+            convertView.setTag(viewHolder);
+            
+        } else
+            viewHolder = (ViewHolder) convertView.getTag();
+        
+        int photoId = (Integer) statuses.get(position).get("photo");
+        
+        // set the data to be displayed
+        viewHolder.photo.setImageDrawable(getResources().getDrawable(
+                                                                     photoId));
+        viewHolder.name.setText(statuses.get(position).get("name")
+                                .toString());
+        
+        // VITAL PART!!! Set the state of the
+        // CheckBox using the boolean array
+        viewHolder.checkBox.setChecked(checkBoxState[position]);
+        
+        // for managing the state of the boolean
+        // array according to the state of the
+        // CheckBox
+        
+        viewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
+            
+            public void onClick(View v) {
+                if (((CheckBox) v).isChecked())
+                    checkBoxState[position] = true;
+                else
+                    checkBoxState[position] = false;
+                
+            }
+        });
+        
+        // return the view to be displayed
+        return convertView;
+    }
+    
+}
+
+public String readIt(InputStream stream, int len) throws IOException,
+UnsupportedEncodingException {
+Reader reader = null;
+reader = new InputStreamReader(stream, "UTF-8");
+Log.e("read", reader.toString());
+
+char[] buffer = new char[len];
+reader.read(buffer);
+// Log.e("read", reader.read(buffer)+"");
+return new String(buffer);
+}
+
+private int sendrequest(String url) throws IOException {
+InputStream result = null;
+URL request = new URL(url);
+Log.v("send", "start");
+Map<String, Object> params = new LinkedHashMap<>();
+StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+.permitAll().build();
+StrictMode.setThreadPolicy(policy);
+StringBuilder postData = new StringBuilder();
+for (Map.Entry<String, Object> param : params.entrySet()) {
+if (postData.length() != 0)
+postData.append('&');
+postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+postData.append('=');
+postData.append(URLEncoder.encode(String.valueOf(param.getValue()),
+"UTF-8"));
+}
+byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+HttpURLConnection conn = (HttpURLConnection) request.openConnection();
+conn.setRequestMethod("POST");
+conn.setRequestProperty("Content-Type",
+"application/x-www-form-urlencoded");
+conn.setRequestProperty("Content-Length",
+String.valueOf(postDataBytes.length));
+conn.setRequestProperty("Set-Cookie", cookietoken);
+conn.setDoOutput(true);
+conn.getOutputStream().write(postDataBytes);
+result = conn.getInputStream();
+Log.e("connect1", conn.getHeaderFields().toString());
+Log.e("connect1", result+"");
+String temp = readIt(result, 300);
+Log.v("connect1", temp);
+Log.v("send", "end");
+return checksconnectstatus(temp);
+}
+
+private String getstreamuser(String url,String userID) throws IOException {
+InputStream result = null;
+URL request = new URL(url);
+Log.v("getstream", "start");
+Map<String, Object> params = new LinkedHashMap<>();
+params.put("userId", userID);
+StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+.permitAll().build();
+StrictMode.setThreadPolicy(policy);
+StringBuilder postData = new StringBuilder();
+for (Map.Entry<String, Object> param : params.entrySet()) {
+if (postData.length() != 0)
+postData.append('&');
+postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+postData.append('=');
+postData.append(URLEncoder.encode(String.valueOf(param.getValue()),
+"UTF-8"));
+}
+
+byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+Log.e("cookie:",cookietoken);
+HttpURLConnection conn = (HttpURLConnection) request.openConnection();
+conn.setRequestMethod("POST");
+conn.setRequestProperty("Content-Type",
+"application/x-www-form-urlencoded");
+conn.setRequestProperty("Content-Length",
+String.valueOf(postDataBytes.length));
+
+conn.setRequestProperty("Set-Cookie", "token="+cookietoken);
+conn.setDoOutput(true);
+conn.getOutputStream().write(postDataBytes);
+result = conn.getInputStream();
+Log.e("getstream", conn.getHeaderFields().toString());
+String temp = readIt(result, 300);
+Log.v("getstream", temp);
+Log.v("getstream", "end");
+getfriendlist(temp);
+return getfriendlist(temp);
+}
+
+private String getfriendlist(String str) {
+String firstname = "ownerFirstName";
+int start = str.indexOf("{");
+int firstnamenum;
+int lastnamenum;
+int useridnum;
+int end = str.indexOf("}");
+if(start==-1){
+return "";
+}
+String error = "null";
+String lastname = "ownerLastName";
+String userid = "streamId";
+String firstnametxt;
+String lastnametxt;
+String useridtex;
+int errornum = str.indexOf(error, start);
+//while(errornum!=)
+
+firstnamenum = str.indexOf(firstname, start);
+lastnamenum = str.indexOf(lastname, start);
+useridnum = str.indexOf(userid, start);
+end = str.indexOf("}", start);
+useridtex = str.substring(useridnum + userid.length() + 3, firstnamenum - 3)
++ "";
+firstnametxt = str.substring(firstnamenum + firstname.length() + 3,
+lastnamenum - 3);
+lastnametxt = str.substring(lastnamenum + lastname.length() + 3,
+end - 1);
+return "ID:"+useridtex+" Name: "+lastnametxt+""+firstnametxt;
+}
+
+private int checksconnectstatus(String str) {
+// int length = str.length();
+
+// str.trim();
+Log.e("check", str);
+String temp = "retFlag";
+int i = str.indexOf(temp);
+int retflag = 100;
+if (str.contains(temp)) {
+retflag = Integer.valueOf(str.charAt(i + 9) + "");
+Log.v("check","retflag:"+ retflag);
+} else {
+Log.v("check", "didnt find retflag");
+}
+// char[] temp = {'c','s'};
+
+return retflag;
+}
+
+@Override
+public boolean onCreateOptionsMenu(Menu menu) {
+// Inflate the menu; this adds items to the action bar if it is present.
+getMenuInflater().inflate(R.menu.personal, menu);
+return true;
+}
+
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {
+// Handle action bar item clicks here. The action bar will
+// automatically handle clicks on the Home/Up button, so long
+// as you specify a parent activity in AndroidManifest.xml.
+int id = item.getItemId();
+if (id == R.id.friendlistcheckBox1) {
+return true;
+}
+return super.onOptionsItemSelected(item);
+}
+
+}

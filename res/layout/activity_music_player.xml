@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@drawable/heise"
+    tools:context=".activity_music_player" >
+
+    <ListView
+        android:id="@+id/song_list"
+        android:layout_width="fill_parent"
+        android:layout_height="298dp"
+        android:layout_weight="0.80" >
+    </ListView>
+
+    <MediaController
+        android:id="@+id/mediaController2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.80" >
+    </MediaController>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.80" 
+        android:layout_marginBottom="14dp">
+
+        <Button
+            android:id="@+id/SettingButton"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:alpha="1"
+            android:text="@string/setting" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/lineareq"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.80"
+        android:orientation="vertical" >
+
+    </LinearLayout>
+
+</LinearLayout>
